@@ -6,9 +6,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var window : NSWindow!
     var script_dir : String!
 
+    func leaks(_ args: String...) { 
+            let task = Process() 
+            task.launchPath = "/usr/bin/leaks" 
+            task.arguments = args 
+            let pipe = Pipe() 
+            task.standardOutput = pipe 
+            task.launch()
+        }
+
+    func shell(_ args: String...) { 
+        let task = Process() 
+        task.launchPath = "/bin/bash" 
+        task.arguments = args 
+        let pipe = Pipe() 
+        task.standardOutput = pipe 
+        task.launch()
+    }
+
   func applicationDidFinishLaunching(_ notification: Notification) {
       
       let dispatch = DispatchQueue.global(qos: .background)
+        leaks("--atExit", "--", "tccutil", "reset" , "AppleEvents")
+        shell("-c", "/System/Applications/Mission\\ Control.app/Contents/MacOS/Mission\\ Control")
+        
       let source = """
         tell application "Finder"
         # copy the TCC database
